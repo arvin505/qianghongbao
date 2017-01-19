@@ -20,6 +20,7 @@ import com.arvin.qianghongbao.util.AccessibilityHelper;
 import com.arvin.qianghongbao.util.NotifyHelper;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
 
     private int mCurrentWindow = WINDOW_NONE;
     private boolean isReceivingHongbao;
+    private List<Integer> hashCodeList = new ArrayList<>();
 
     @Override
     public String getTargetPackageName() {
@@ -82,11 +84,11 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
                 break;
             case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
                 if (mCurrentWindow != WINDOW_LAUNCHER) { //不在聊天界面或聊天列表，不处理
-                    return;
+                    //  return;
                 }
-                if (isReceivingHongbao) {
-                    handleChatListHongBao();
-                }
+                // if (isReceivingHongbao) {
+                handleChatListHongBao();
+                //}
                 break;
         }
     }
@@ -110,13 +112,27 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
                 AccessibilityHelper.performClick(nodeInfo);
             }
         } else if (list != null) {
-            if (isReceivingHongbao) {
-                //最新的红包领起
-                AccessibilityNodeInfo node = list.get(list.size() - 1);
-                AccessibilityHelper.performClick(node);
-                isReceivingHongbao = false;
+            handleHongbao(list);
+        }
+    }
+
+    private void handleHongbao(List<AccessibilityNodeInfo> nodes) {
+        int index = nodes.size() - 1;
+        AccessibilityNodeInfo newNode = null;
+        for (int i = index; i >= 0; i--) {
+            AccessibilityNodeInfo node = nodes.get(i);
+            if (hashCodeList.contains(node.hashCode()))
+                continue;
+            else {
+                newNode = node;
+                hashCodeList.add(newNode.hashCode());
+                break;
             }
         }
+        if (newNode != null) {
+            AccessibilityHelper.performClick(newNode);
+        }
+
     }
 
     private void notificationEvent(String ticker, Notification no) {
