@@ -38,6 +38,8 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     private static final String WECHAT_HONGBAO_DETAIL = "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI";
 
     private static final String KAI_BUTTON_ID = "com.tencent.mm:id/be_";
+    //nodeInfo.findFocus(1).findAccessibilityNodeInfosByViewId("com.tencent.mm:id/adu")
+    private static final String LIST_ITEM_ID = "com.tencent.mm:id/adu";
     private static final long DELAY_MILLS = 300;
     /**
      * 红包消息的关键字
@@ -93,7 +95,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
     private void handleChatListHongBao() {
         AccessibilityNodeInfo nodeInfo = getService().getRootInActiveWindow();
         if (nodeInfo == null) {
@@ -110,6 +112,18 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
                 }
                 isReceivingHongbao = true;
                 AccessibilityHelper.performClick(nodeInfo);
+            } else {
+                AccessibilityNodeInfo focus = nodeInfo.findFocus(1);
+                if (focus!=null) {
+                    List<AccessibilityNodeInfo> chatList = focus.findAccessibilityNodeInfosByViewId(LIST_ITEM_ID);
+                    if (chatList != null && !chatList.isEmpty()) {
+                        for (AccessibilityNodeInfo info : chatList) {
+                            if (String.valueOf(info.getText()).contains(HONGBAO_TEXT_KEY)) {
+                                AccessibilityHelper.performClick(info);
+                            }
+                        }
+                    }
+                }
             }
         } else if (list != null) {
             handleHongbao(list);
