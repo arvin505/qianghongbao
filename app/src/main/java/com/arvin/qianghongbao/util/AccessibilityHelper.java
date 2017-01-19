@@ -23,7 +23,7 @@ public class AccessibilityHelper {
     public static AccessibilityNodeInfo findNodeInfosById(AccessibilityNodeInfo root, String resId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             List<AccessibilityNodeInfo> list = root.findAccessibilityNodeInfosByViewId(resId);
-            if (list != null && list.isEmpty()) {
+            if (list != null && !list.isEmpty()) {
                 return list.get(0);
             }
         }
