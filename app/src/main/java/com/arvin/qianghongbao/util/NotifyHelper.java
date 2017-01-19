@@ -95,8 +95,8 @@ public class NotifyHelper {
         if (NotifyHelper.isNightTime()) {
             return;
         }
-        sound(context);
-        vibrator(context);
+        //sound(context);
+        //vibrator(context);
     }
 
     /**
