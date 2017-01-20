@@ -41,6 +41,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     //nodeInfo.findFocus(1).findAccessibilityNodeInfosByViewId("com.tencent.mm:id/adu")
     private static final String LIST_ITEM_ID = "com.tencent.mm:id/adu";
     private static final long DELAY_MILLS = 300;
+    private static final int SCREEN_HONGBAO_COUNT = 5;
     /**
      * 红包消息的关键字
      */
@@ -114,7 +115,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
                 AccessibilityHelper.performClick(nodeInfo);
             } else {
                 AccessibilityNodeInfo focus = nodeInfo.findFocus(1);
-                if (focus!=null) {
+                if (focus != null) {
                     List<AccessibilityNodeInfo> chatList = focus.findAccessibilityNodeInfosByViewId(LIST_ITEM_ID);
                     if (chatList != null && !chatList.isEmpty()) {
                         for (AccessibilityNodeInfo info : chatList) {
@@ -131,7 +132,21 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
     }
 
     private void handleHongbao(List<AccessibilityNodeInfo> nodes) {
+
         int index = nodes.size() - 1;
+        if (hashCodeList.size() >= SCREEN_HONGBAO_COUNT) {
+            hashCodeList.remove(0);
+        }
+        if (nodes.size() <= hashCodeList.size()) {
+            ArrayList<Integer> temp = new ArrayList<>();
+            for (AccessibilityNodeInfo i : nodes) {
+                if (hashCodeList.contains(i.hashCode())) {
+                    temp.add(i.hashCode());
+                }
+            }
+            hashCodeList.clear();
+            hashCodeList.addAll(temp);
+        }
         AccessibilityNodeInfo newNode = null;
         for (int i = index; i >= 0; i--) {
             AccessibilityNodeInfo node = nodes.get(i);
@@ -146,6 +161,7 @@ public class WechatAccessbilityJob extends BaseAccessbilityJob {
         if (newNode != null) {
             AccessibilityHelper.performClick(newNode);
         }
+
 
     }
 
